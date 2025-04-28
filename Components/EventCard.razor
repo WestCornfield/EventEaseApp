@@ -1,0 +1,126 @@
+@namespace EventEaseApp.Components
+@using EventEaseApp.Models
+@using System.ComponentModel.DataAnnotations
+
+@inject EventService EventService
+
+<div>
+    <div class="event-card">
+        <EditForm Model="@Event" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+            <DataAnnotationsValidator />
+
+            <h3>
+                @if (editMode)
+                {
+                    <div>
+                        <label for="name">Event Name:</label>
+                        <input id="name" @bind="Event.Name" class="form-control" />
+                        <ValidationMessage For="@(() => Event.Name)" />
+                    </div>
+                }
+                else
+                {
+                    <span>@Event.Name</span>
+                }
+            </h3>
+
+            <div>
+                @if (editMode)
+                {
+                    <div>
+                        <label for="date">Event Date:</label>
+                        <input id="date" type="date" @bind="Event.Date" class="form-control" />
+                        <ValidationMessage For="@(() => Event.Date)" />
+                    </div>
+                }
+                else
+                {
+                    <strong>Date:</strong>
+                    <span>@Event.Date.ToString("MMMM dd, yyyy")</span>
+                }
+            </div>
+
+            <div>
+                @if (editMode)
+                {
+                    <div>
+                        <label for="location">Event Location:</label>
+                        <input id="location" @bind="Event.Location" class="form-control" />
+                        <ValidationMessage For="@(() => Event.Location)" />
+                    </div>
+                }
+                else
+                {
+                    <strong>Location:</strong>
+                    <span>@Event.Location</span>
+                }
+            </div>
+
+            @if (editMode)
+            {
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary" @onclick="EditEvent">Edit</button>
+            }
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private bool editMode = false;
+    private Event? originalEvent;
+
+    private void EditEvent()
+    {
+        // Create a backup of the original event
+        if (Event != null)
+        {
+            originalEvent = new Event
+            {
+                Id = Event.Id,
+                Name = Event.Name,
+                Date = Event.Date,
+                Location = Event.Location,
+                Description = Event.Description
+            };
+        }
+        editMode = true;
+    }
+
+    private void CancelEdit()
+    {
+        // Revert to the original event values
+        if (originalEvent != null)
+        {
+            Event.Name = originalEvent.Name;
+            Event.Date = originalEvent.Date;
+            Event.Location = originalEvent.Location;
+            Event.Description = originalEvent.Description;
+        }
+        editMode = false;
+    }
+
+    private async Task HandleValidSubmit() {
+        await EventSaved.InvokeAsync(Event);
+        editMode = false;
+    }
+
+    private void HandleInvalidSubmit() {
+        Console.WriteLine("Form submission failed due to validation errors.");
+    }
+
+    [Parameter]
+    public Event? Event { get; set; }
+
+    [Parameter]
+    public EventCallback<Event> EventSaved { get; set; }
+
+    [Parameter]
+    public EventCallback<Event> EditCanceled { get; set; }
+
+    [Parameter]
+    public EventCallback<int> CardButtonClicked { get; set; }
+}

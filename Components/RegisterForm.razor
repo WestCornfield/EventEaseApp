@@ -1,0 +1,63 @@
+@namespace EventEaseApp.Components
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@inject EventEaseApp.Services.UserSessionService UserSessionService
+
+<div class="register-form">
+    @if (!UserSessionService.IsLoggedIn)
+    {
+        <EditForm Model="@Registration" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div>
+                <label for="name">Name:</label>
+                <input id="name" @bind="Registration.Name" class="form-control" />
+                <ValidationMessage For="@(() => Registration.Name)" />
+            </div>
+
+            <div>
+                <label for="email">Email:</label>
+                <input id="email" type="email" @bind="Registration.Email" class="form-control" />
+                <ValidationMessage For="@(() => Registration.Email)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </EditForm>
+    }
+    else
+    {
+        <p class="success-message">Welcome back, @UserSessionService.UserName!</p>
+        <button class="btn btn-secondary" @onclick="Logout">Logout</button>
+    }
+</div>
+
+@code {
+    private RegistrationModel Registration { get; set; } = new RegistrationModel();
+
+    private void HandleValidSubmit()
+    {
+        // Start a new user session
+        UserSessionService.StartSession(Registration.Name, Registration.Email);
+
+        // Reset the form
+        Registration = new RegistrationModel();
+    }
+
+    private void Logout()
+    {
+        UserSessionService.EndSession();
+    }
+
+    private class RegistrationModel
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string Email { get; set; } = string.Empty;
+    }
+}

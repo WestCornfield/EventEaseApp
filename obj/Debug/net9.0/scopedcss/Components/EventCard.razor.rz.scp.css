@@ -1,0 +1,24 @@
+.event-card[b-8zxbkopuut] {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.event-card h3[b-8zxbkopuut] {
+    margin: 0 0 8px;
+    font-size: 1.5em;
+}
+
+.event-card p[b-8zxbkopuut] {
+    margin: 4px 0;
+    font-size: 1em;
+}
+
+.validation-message[b-8zxbkopuut] {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+}

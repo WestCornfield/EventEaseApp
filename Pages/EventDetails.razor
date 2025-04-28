@@ -1,0 +1,49 @@
+@page "/eventdetails/{EventId:int}"
+@using EventEaseApp.Components
+@using EventEaseApp.Models
+
+<PageTitle>Event Details</PageTitle>
+
+<h1>Event Details</h1>
+
+@if (SelectedEvent == null)
+{
+    <p>Event not found.</p>
+}
+else
+{
+    <div class="event-details">
+        <h2>@SelectedEvent.Name</h2>
+        <p><strong>Date:</strong> @SelectedEvent.Date.ToString("MMMM dd, yyyy")</p>
+        <p><strong>Location:</strong> @SelectedEvent.Location</p>
+        <p><strong>Description:</strong> @SelectedEvent.Description</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? SelectedEvent { get; set; }
+
+    private List<Event> Events { get; set; } = new List<Event>
+    {
+        new Event { Id = 1, Name = "Tech Conference 2025", Date = new DateTime(2025, 5, 15), Location = "San Francisco, CA", Description = "A conference for tech enthusiasts." },
+        new Event { Id = 2, Name = "Music Festival", Date = new DateTime(2025, 6, 20), Location = "Austin, TX", Description = "A festival featuring live music performances." },
+        new Event { Id = 3, Name = "Art Expo", Date = new DateTime(2025, 7, 10), Location = "New York, NY", Description = "An exhibition showcasing modern art." }
+    };
+
+    protected override void OnParametersSet()
+    {
+        SelectedEvent = Events.FirstOrDefault(e => e.Id == EventId);
+    }
+
+    private class Event
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public string Location { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}

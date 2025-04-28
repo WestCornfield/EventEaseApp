@@ -1,0 +1,65 @@
+@page "/register"
+@using EventEaseApp.Models
+@using EventEaseApp.Services;
+
+<PageTitle>Register Event</PageTitle>
+
+<h1>Register a New Event</h1>
+
+<div class="register-form">
+    <EditForm Model="@NewEvent" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="name">Event Name:</label>
+            <input id="name" @bind="NewEvent.Name" class="form-control" />
+        </div>
+
+        <div>
+            <label for="date">Event Date:</label>
+            <input id="date" type="date" @bind="NewEvent.Date" class="form-control" />
+        </div>
+
+        <div>
+            <label for="location">Event Location:</label>
+            <input id="location" @bind="NewEvent.Location" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Register Event</button>
+    </EditForm>
+</div>
+
+@if (SuccessMessage != null)
+{
+    <p class="success-message">@SuccessMessage</p>
+}
+
+@inject EventService EventService
+
+@code {
+    private Event NewEvent { get; set; } = new Event();
+    private string? SuccessMessage { get; set; }
+    private List<Event> Events { get; set; } = new List<Event>
+    {
+        new Event { Id = 1, Name = "Tech Conference 2025", Date = new DateTime(2025, 5, 15), Location = "San Francisco, CA" },
+        new Event { Id = 2, Name = "Music Festival", Date = new DateTime(2025, 6, 20), Location = "Austin, TX" },
+        new Event { Id = 3, Name = "Art Expo", Date = new DateTime(2025, 7, 10), Location = "New York, NY" }
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        // Generate a new Id for the event
+        NewEvent.Id = Events.Count > 0 ? Events.Max(e => e.Id) + 1 : 1;
+
+        // Add the new event to the list
+        //Events.Add(NewEvent);
+        await EventService.AddEventAsync(NewEvent);
+
+        // Display a success message
+        SuccessMessage = $"Event '{NewEvent.Name}' has been successfully registered!";
+
+        // Reset the form
+        NewEvent = new Event();
+    }
+}

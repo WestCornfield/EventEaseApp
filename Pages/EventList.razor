@@ -1,0 +1,57 @@
+@page "/events"
+@using EventEaseApp.Components
+@using EventEaseApp.Models
+@using EventEaseApp.Services;
+
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Event List</PageTitle>
+
+<h1>Event List</h1>
+
+@if (Events == null)
+{
+    <p>Loading events...</p>
+}
+else if (Events.Count == 0)
+{
+    <p>No events available.</p>
+}
+else
+{
+    <div class="event-list">
+        @foreach (var eventItem in Events)
+        {
+            <EventCard 
+                @key="@eventItem.Id"
+                Event="@eventItem" 
+                CardButtonClicked="HandleEventCardClicked" 
+                EventSaved="HandleEventSaved"
+            />
+        }
+    </div>
+}
+
+<h2>Register for an Event</h2>
+<RegisterForm />
+
+@code {   
+    private List<Event>? Events { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Events = await EventService.GetEventsAsync();
+    }
+
+    private void HandleEventCardClicked(int eventId)
+    {
+        NavigationManager.NavigateTo("/eventdetails/" + eventId);
+    }
+
+    private async Task HandleEventSaved(Event updatedEvent)
+    {
+        await EventService.UpdateEventAsync(updatedEvent);
+        Events = await EventService.GetEventsAsync();
+    }
+}
